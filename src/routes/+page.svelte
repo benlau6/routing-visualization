@@ -246,7 +246,7 @@
 					{#each currentVehicle.original_path.map( (e, i) => [e, currentVehicle.original_time[i]] ) as [item, time]}
 						{@const [lng, lat] = truncateLatLng(item)}
 						<li>
-							Time {minutesToTime(time)}: Location {lng}, {lat}
+							Time {minutesToTime(time)}: Location {lat}, {lng}
 						</li>
 					{/each}
 				</ol>
