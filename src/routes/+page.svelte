@@ -181,6 +181,10 @@
 		const [lat, lng] = latlng;
 		return [truncate(lat), truncate(lng)];
 	}
+
+	function getGoogleMapUrl(lat, lng) {
+		return `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
+	}
 </script>
 
 <main>
@@ -237,7 +241,11 @@
 							{/if}
 						{/if}
 					{/each}
-					<li>Depot: {currentVehicleDepot[1]}, {currentVehicleDepot[0]}</li>
+					<li>
+						Depot: <a href={getGoogleMapUrl(currentVehicleDepot[1], currentVehicleDepot[0])}
+							>{currentVehicleDepot[1]}, {currentVehicleDepot[0]}</a
+						>
+					</li>
 				</ul>
 			</figure>
 			<figure class="route">
@@ -246,7 +254,8 @@
 					{#each currentVehicle.original_path.map( (e, i) => [e, currentVehicle.original_time[i]] ) as [item, time]}
 						{@const [lng, lat] = truncateLatLng(item)}
 						<li>
-							Time {minutesToTime(time)}: Location {lat}, {lng}
+							at {minutesToTime(time)}:
+							<a href={getGoogleMapUrl(lat, lng)}>{lat}, {lng}</a>
 						</li>
 					{/each}
 				</ol>
@@ -267,11 +276,13 @@
 	.slider {
 		width: 100%;
 	}
+	/*
 	.embedded-text {
 		line-height: 1;
 		text-shadow: 2px 2px 4px black;
 		background: rgba(255, 255, 255, 0.5);
 	}
+  */
 
 	.datetime {
 		display: flex;
