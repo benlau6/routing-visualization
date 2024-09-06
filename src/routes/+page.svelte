@@ -310,6 +310,41 @@
 			</div>
 		</figure>
 	{/if}
+	<button class="request-btn" on:click={() => (showRequests = !showRequests)}>
+		{#if showRequests}
+			<span>Hide Handled Requests</span>
+		{:else}
+			<span>Show Handled Requests</span>
+		{/if}
+	</button>
+	{#if showRequests}
+		<figure class="summary">
+			<figcaption>Details of Handled Requests</figcaption>
+			<ul>
+				{#each [...Array(summary.num_accepted_requests).keys()] as i}
+					{@const pickup = stops[i]}
+					{@const dropoff = stops[i + Number(summary.num_requests)]}
+					<li>
+						Request {i + 1}:
+						<ul>
+							<li>
+								Pickup at {minutesToTime(pickup.arrival_time)}:
+								<a href={getGoogleMapUrl(pickup.coordinates[1], pickup.coordinates[0])}
+									>{pickup.coordinates[1]}, {pickup.coordinates[0]}</a
+								>
+							</li>
+							<li>
+								Dropoff at {minutesToTime(dropoff.arrival_time)}:
+								<a href={getGoogleMapUrl(dropoff.coordinates[1], dropoff.coordinates[0])}
+									>{dropoff.coordinates[1]}, {dropoff.coordinates[0]}</a
+								>
+							</li>
+						</ul>
+					</li>
+				{/each}
+			</ul>
+		</figure>
+	{/if}
 </main>
 
 <style>
@@ -372,5 +407,10 @@
 
 	button {
 		font-size: 24px;
+	}
+
+	.request-btn {
+		padding: 8px 16px;
+		margin-bottom: 8px;
 	}
 </style>
