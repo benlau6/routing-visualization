@@ -1,15 +1,15 @@
 {
-  "date": "2024-08-01",
-  "num_depots": 17,
-  "num_used_vehicles": 36,
-  "num_requests": 198,
-  "num_accepted_requests": 196,
-  "num_rejected_requests": 2,
-  "num_ride_sharing": 25,
-  "num_wheelchairs": 163,
-  "num_passengers": 288,
-  "total_duration": 10473,
-  "total_waiting_time": 1033,
-  "total_service_time": 2858,
-  "total_travel_time": 6582
+  "date": "1999-01-01",
+  "num_depots": 10,
+  "num_used_vehicles": 30,
+  "num_requests": 195,
+  "num_accepted_requests": 184,
+  "num_rejected_requests": 11,
+  "num_ride_sharing": 38,
+  "num_wheelchairs": 294,
+  "num_passengers": 342,
+  "total_duration": 18375,
+  "total_waiting_time": 2775,
+  "total_service_time": 4800,
+  "total_travel_time": 10800
 }
