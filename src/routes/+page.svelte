@@ -122,11 +122,6 @@
 		return new IconLayer({
 			...iconLayerDefaultProps,
 			id: 'pickup-icon',
-			// iconAtlas:
-			// 	'https://raw.githubusercontent.com/visgl/deck.gl/9.0-release/examples/website/icon/data/location-icon-atlas.png',
-			// iconMapping:
-			// 	'https://raw.githubusercontent.com/visgl/deck.gl/9.0-release/examples/website/icon/data/location-icon-mapping.json',
-			// getIcon: (d) => getIconName(d.num_wheelchairs + d.num_passengers),
 			getIcon: getIconFn(pickupImg),
 			// show for 30 unit time before latest pickup time,
 			getFilterValue: (d) => d.time_window[1],
