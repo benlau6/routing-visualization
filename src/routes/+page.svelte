@@ -53,8 +53,8 @@
 		map = new maplibregl.Map({
 			container: 'map', // container id
 			style: mapStyle, // stylesheet location
-			center: [114.107216, 22.352711], // starting position [lng, lat]
-			zoom: 11 // starting zoom
+			center: [114.157216, 22.362711], // starting position [lng, lat]
+			zoom: 10.7 // starting zoom
 		});
 		map.addControl(new maplibregl.NavigationControl(), 'top-right');
 
