@@ -222,8 +222,8 @@
 		bind:value={time}
 		on:mousedown={() => stopVehicles(moveId)}
 	/>
-	<div class="datetime">
 		<div class="date">2024-08-01</div>
+	<div class="map-bottom-bar">
 		<div class="time">
 			{minutesToTime(time)}
 		</div>
@@ -323,17 +323,17 @@
 	}
   */
 
-	.datetime {
+	.map-bottom-bar {
 		display: flex;
 		justify-content: space-between;
 		gap: 16px;
 		font-size: 48px;
 	}
-	.datetime > * {
+	.map-bottom-bar > * {
 		flex-grow: 1;
 		flex-basis: 0;
 	}
-	.datetime > div:nth-child(2) {
+	.map-bottom-bar > div:nth-child(2) {
 		text-align: center;
 	}
 	.action-gp {
