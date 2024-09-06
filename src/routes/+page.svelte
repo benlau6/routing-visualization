@@ -53,6 +53,10 @@
 	$: currentVehicleDepot = currentVehicleId
 		? truncateLatLng(currentVehicle.original_path[0])
 		: null;
+	$: filteredTrips = currentVehicleId ? [currentVehicle] : trips;
+	$: filteredStops = currentVehicleId
+		? stops.filter((stop) => currentVehicle?.route.includes(stop.idx))
+		: stops;
 
 	onMount(async () => {
 		map = new maplibregl.Map({
@@ -99,7 +103,7 @@
 	function createTripsLayer(time) {
 		return new TripsLayer({
 			id: 'trips',
-			data: trips,
+			data: filteredTrips,
 			getPath: (d) => d.path,
 			getTimestamps: (d) => d.time,
 			getColor: (d) => colors[d.vehicle % summary.num_depots],
@@ -111,15 +115,6 @@
 		});
 	}
 
-	const iconLayerDefaultProps = {
-		data: stops,
-		getPosition: (d) => d.coordinates,
-		getSize: () => 20,
-		getColor: () => iconDefaultColor,
-		getFilterCategory: (d) => d.stop_type,
-		pickable: true
-	};
-
 	function createPickupIconLayer(time) {
 		return new IconLayer({
 			...iconLayerDefaultProps,
@@ -128,6 +123,7 @@
 			// show for 30 unit time before arrival
 			getFilterValue: (d) => d.arrival_time,
 			filterRange: [time, time + 30],
+			getFilterCategory: (d) => d.stop_type,
 			filterCategories: ['pickup'],
 			extensions: [new DataFilterExtension({ filterSize: 1, categorySize: 1 })]
 		});
@@ -141,6 +137,7 @@
 			// show 30 unit time before arrival
 			getFilterValue: (d) => d.arrival_time,
 			filterRange: [time, time + 30],
+			getFilterCategory: (d) => d.stop_type,
 			filterCategories: ['dropoff'],
 			extensions: [new DataFilterExtension({ filterSize: 1, categorySize: 1 })]
 		});
@@ -153,6 +150,7 @@
 			getIcon: getIconFn(depotImg),
 			getColor: (d) => colors[getDepotNode(d.idx)],
 			// sum of number of elements in sample space of each category cannot exceed 128
+			getFilterCategory: (d) => d.stop_type,
 			filterCategories: ['depot'],
 			// https://github.com/visgl/deck.gl/issues/9049#issuecomment-2253690167
 			// Extension settings (categorySize in this case) are not designed to change on the fly.
@@ -192,6 +190,14 @@
 	});
 
 	const getDepotNode = (stop_idx) => (stop_idx - summary.num_requests * 2) % summary.num_depots;
+
+	$: iconLayerDefaultProps = {
+		data: filteredStops,
+		getPosition: (d) => d.coordinates,
+		getSize: () => 20,
+		getColor: () => iconDefaultColor,
+		pickable: true
+	};
 
 	function minutesToTime(mins) {
 		mins = mins.toFixed(0);
