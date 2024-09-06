@@ -47,10 +47,12 @@
 	let currentVehicleId = null;
 
 
-	$: currentVehicle = trips.filter((trip) => trip.vehicle === currentVehicleId)[0];
-	$: currentVehicleDepot = truncateLatLng(currentVehicle.original_path[0]);
 	let map = null;
 	let overlay = null;
+	$: currentVehicle = trips.find((trip) => trip.vehicle === currentVehicleId);
+	$: currentVehicleDepot = currentVehicleId
+		? truncateLatLng(currentVehicle.original_path[0])
+		: null;
 
 	onMount(async () => {
 		map = new maplibregl.Map({
