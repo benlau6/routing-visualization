@@ -17,11 +17,6 @@
 	import dropoffImg from '$lib/images/dest.png';
 	import depotImg from '$lib/images/depot.png';
 
-	let darkMode = false;
-	const iconDefaultColor = darkMode ? [255, 255, 255] : [0, 0, 0];
-	const mapStyle = darkMode
-		? 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json'
-		: 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json';
 	let colors;
 	if (rawSummary.num_depots <= 10) {
 		colors = color10;
@@ -38,17 +33,23 @@
 	);
 	const startTime = 60 * 6; // 6:00
 	const endTime = 60 * 22; // 22:00
-	$: time = startTime;
-	$: renderLayers(time);
-	$: if (time >= endTime) time = startTime;
 
+	let map = null;
+	let overlay = null;
+	let darkMode = false;
+	let showRequests = false;
 	let moving = false;
 	let moveId = runVehicles();
 	let currentVehicleId = null;
 
+	$: mapStyle = darkMode
+		? 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json'
+		: 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json';
+	$: iconDefaultColor = darkMode ? [255, 255, 255] : [0, 0, 0];
 
-	let map = null;
-	let overlay = null;
+	$: time = startTime;
+	$: if (time >= endTime) resetTime();
+
 	$: currentVehicle = trips.find((trip) => trip.vehicle === currentVehicleId);
 	$: currentVehicleDepot = currentVehicleId
 		? truncateLatLng(currentVehicle.original_path[0])
@@ -57,6 +58,7 @@
 	$: filteredStops = currentVehicleId
 		? stops.filter((stop) => currentVehicle?.route.includes(stop.idx))
 		: stops;
+	$: renderLayers(time);
 
 	onMount(async () => {
 		map = new maplibregl.Map({
