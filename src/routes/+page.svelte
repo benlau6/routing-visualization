@@ -9,9 +9,7 @@
 
 	import trips from './routes.json';
 	import stops from './stops.json';
-	import summary from './summary.json';
-
-	delete summary.date;
+	import rawSummary from './summary.json';
 
 	import color10 from './colors-tableau10.json';
 	import color20 from './colors-tableau20.json';
@@ -33,6 +31,11 @@
 		throw new Error('Number of depots is too large, not enough colors to cover');
 	}
 
+	const date = rawSummary.date;
+	// exclude 'date' keys
+	const summary = Object.fromEntries(
+		Object.entries(rawSummary).filter(([key, _]) => !key.includes('date'))
+	);
 	const startTime = 60 * 6; // 6:00
 	const endTime = 60 * 22; // 22:00
 	$: time = startTime;
