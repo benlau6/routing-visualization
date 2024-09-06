@@ -40,17 +40,14 @@
 	let showRequests = false;
 	let moving = false;
 	let moveId = runVehicles();
-	let currentVehicleId = null;
+	let currentVehicle;
 
 	$: mapStyle = darkMode
 		? 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json'
 		: 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json';
 	$: iconDefaultColor = darkMode ? [255, 255, 255] : [0, 0, 0];
 
-	$: currentVehicle = trips.find((trip) => trip.vehicle === currentVehicleId);
-	$: currentVehicleDepot = currentVehicleId
-		? truncateLatLng(currentVehicle.original_path[0])
-		: null;
+	$: currentVehicleDepot = currentVehicle ? truncateLatLng(currentVehicle.original_path[0]) : null;
 
 	$: startTime = currentVehicle ? currentVehicle.original_time[0] : serviceStartTime;
 	$: endTime = currentVehicle
@@ -58,8 +55,8 @@
 		: serviceEndTime;
 	$: time = startTime;
 
-	$: filteredTrips = currentVehicleId ? [currentVehicle] : trips;
-	$: filteredStops = currentVehicleId
+	$: filteredTrips = currentVehicle ? [currentVehicle] : trips;
+	$: filteredStops = currentVehicle
 		? stops.filter((stop) => currentVehicle?.route.includes(stop.idx))
 		: stops;
 
@@ -243,17 +240,17 @@
 			{minutesToTime(time)}
 		</div>
 		<div class="action-gp">
-			{#if currentVehicleId}
+			{#if currentVehicle}
 				<button
 					on:click={() => {
-						currentVehicleId = null;
+						currentVehicle = null;
 					}}>Show all</button
 				>
 			{/if}
-			<select bind:value={currentVehicleId}>
+			<select bind:value={currentVehicle}>
 				<option value={null}>Show all</option>
 				{#each trips as trip}
-					<option value={trip.vehicle}>Route of vehicle {trip.vehicle}</option>
+					<option value={trip}>Route of vehicle {trip.vehicle}</option>
 				{/each}
 			</select>
 			{#if moving}
@@ -264,7 +261,7 @@
 		</div>
 	</div>
 
-	{#if !currentVehicleId}
+	{#if !currentVehicle}
 		<figure class="summary">
 			<figcaption>Summary Statistics</figcaption>
 			<ul>
@@ -279,7 +276,7 @@
 		</figure>
 	{:else}
 		<figure>
-			<figcaption>Details of the vehicle {currentVehicleId}</figcaption>
+			<figcaption>Details of the vehicle {currentVehicle.vehicle}</figcaption>
 			<div class="detail-wrapper">
 				<figure class="summary">
 					<figcaption>Summary</figcaption>
