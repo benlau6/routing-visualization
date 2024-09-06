@@ -227,11 +227,26 @@
 		<div class="time">
 			{minutesToTime(time)}
 		</div>
-		{#if moving}
-			<button on:click={() => stopVehicles(moveId)}>Stop</button>
-		{:else}
-			<button on:click={() => (moveId = runVehicles())}>Run</button>
-		{/if}
+		<div class="action-gp">
+			{#if currentVehicleId}
+				<button
+					on:click={() => {
+						currentVehicleId = null;
+					}}>Show all</button
+				>
+			{/if}
+			<select bind:value={currentVehicleId}>
+				<option value={null}>Show all</option>
+				{#each trips as trip}
+					<option value={trip.vehicle}>Route of vehicle {trip.vehicle}</option>
+				{/each}
+			</select>
+			{#if moving}
+				<button on:click={() => stopVehicles(moveId)}>Stop</button>
+			{:else}
+				<button on:click={() => (moveId = runVehicles())}>Run</button>
+			{/if}
+		</div>
 	</div>
 	<figure class="summary">
 		<figcaption>Summary Statistics</figcaption>
@@ -321,8 +336,16 @@
 	.datetime > div:nth-child(2) {
 		text-align: center;
 	}
-	.datetime > div:nth-child(3) {
-		text-align: right;
+	.action-gp {
+		display: flex;
+		justify-content: end;
+		gap: 16px;
+	}
+	.action-gp > * {
+		flex-grow: 1;
+		flex-basis: 0;
+		font-size: 24px;
+		text-wrap: nowrap;
 	}
 
 	figure {
@@ -333,12 +356,12 @@
 		columns: 2;
 	}
 
-	.vehicle-select {
-		width: 100%;
-		font-size: 24px;
-	}
 	.detail-wrapper {
 		display: flex;
 		gap: 32px;
+	}
+
+	button {
+		font-size: 24px;
 	}
 </style>
