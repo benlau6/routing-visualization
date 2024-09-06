@@ -41,20 +41,7 @@
 
 	let moving = false;
 	let moveId = runVehicles();
-	function runVehicles() {
-		if (moving) return;
 
-		moving = true;
-		return setInterval(() => {
-			time += 1;
-		}, 50);
-	}
-	function stopVehicles(moveId) {
-		if (moving) {
-			moving = false;
-			clearInterval(moveId);
-		}
-	}
 
 	let currentVehicleId = 0;
 	$: currentVehicle = trips.filter((trip) => trip.vehicle === currentVehicleId)[0];
@@ -123,13 +110,6 @@
 		pickable: true
 	};
 
-	const getIconFn = (url) => () => ({
-		url,
-		width: 124,
-		height: 124,
-		mask: true
-	});
-
 	function createPickupIconLayer(time) {
 		return new IconLayer({
 			...iconLayerDefaultProps,
@@ -172,6 +152,35 @@
 		});
 	}
 
+	function resetTime() {
+		// if there is any other side effect that is not defined in Deck.gl
+		// and if they are dependent on time,
+		// they need to be reset here
+		time = startTime;
+	}
+
+	function runVehicles() {
+		if (moving) return;
+
+		moving = true;
+		return setInterval(() => {
+			time += 1;
+		}, 50);
+	}
+
+	function stopVehicles(moveId) {
+		if (moving) {
+			moving = false;
+			clearInterval(moveId);
+		}
+	}
+
+	const getIconFn = (url) => () => ({
+		url,
+		width: 124,
+		height: 124,
+		mask: true
+	});
 
 	const getDepotNode = (stop_idx) => (stop_idx - summary.num_requests * 2) % summary.num_depots;
 
