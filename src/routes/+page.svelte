@@ -13,7 +13,8 @@
 
 	delete summary.date;
 
-	import colors from './colors-tableau20.json';
+	import color10 from './colors-tableau10.json';
+	import color20 from './colors-tableau20.json';
 	import pickupImg from '$lib/images/pin.png';
 	import dropoffImg from '$lib/images/dest.png';
 	import depotImg from '$lib/images/depot.png';
@@ -23,6 +24,14 @@
 	const mapStyle = darkMode
 		? 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json'
 		: 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json';
+	let colors;
+	if (rawSummary.num_depots <= 10) {
+		colors = color10;
+	} else if (rawSummary.num_depots <= 20) {
+		colors = color20;
+	} else {
+		throw new Error('Number of depots is too large, not enough colors to cover');
+	}
 
 	const startTime = 60 * 6; // 6:00
 	const endTime = 60 * 22; // 22:00
@@ -96,9 +105,7 @@
 			data: trips,
 			getPath: (d) => d.path,
 			getTimestamps: (d) => d.time,
-			// getColor: (d) => [253, 128, 93], // default red
-			// getColor: (d) => [23, 184, 190], // default blue
-			getColor: (d) => colors[d.vehicle % 17],
+			getColor: (d) => colors[d.vehicle % summary.num_depots],
 			currentTime: time,
 			trailLength: 10,
 			capRounded: true,
@@ -122,8 +129,6 @@
 		height: 124,
 		mask: true
 	});
-
-	const getDepotNode = (stop_idx) => (stop_idx - stops.length + 17) % 17;
 
 	function createPickupIconLayer(time) {
 		return new IconLayer({
@@ -166,6 +171,9 @@
 			extensions: [new DataFilterExtension({ categorySize: 1 })]
 		});
 	}
+
+
+	const getDepotNode = (stop_idx) => (stop_idx - summary.num_requests * 2) % summary.num_depots;
 
 	function minutesToTime(mins) {
 		mins = mins.toFixed(0);
