@@ -147,7 +147,11 @@
 			id: 'depot-icon',
 			getIcon: getIconFn(depotImg),
 			getColor: (d) => colors[getDepotNode(d.idx)],
+			// sum of number of elements in sample space of each category cannot exceed 128
 			filterCategories: ['depot'],
+			// https://github.com/visgl/deck.gl/issues/9049#issuecomment-2253690167
+			// Extension settings (categorySize in this case) are not designed to change on the fly.
+			// Think of a layer + extension combination as a new type of layer - you can't change the same layer from Scatterplot to Text.
 			extensions: [new DataFilterExtension({ categorySize: 1 })]
 		});
 	}
