@@ -8,7 +8,7 @@
 	import 'maplibre-gl/dist/maplibre-gl.css';
 
 	import trips from './routes.json';
-	import stops from './stops.json';
+	import stops from './stop_solutions.json';
 	import rawSummary from './summary.json';
 
 	import color10 from './colors-tableau10.json';
@@ -71,9 +71,9 @@
 			],
 			getTooltip: ({ object }) =>
 				object &&
-				`${object.type} 
+				`${object.stop_type} 
         request: ${object.request_id}
-        time: ${minutesToTime(object.time_window[0])} - ${minutesToTime(object.time_window[1])}
+        time: ${minutesToTime(object.arrival_time)}
         num_passengers: ${object.num_passengers}
         num_wheelchairs: ${object.num_wheelchairs}`
 		});
@@ -114,7 +114,7 @@
 		getPosition: (d) => d.coordinates,
 		getSize: () => 20,
 		getColor: () => iconDefaultColor,
-		getFilterCategory: (d) => d.type,
+		getFilterCategory: (d) => d.stop_type,
 		pickable: true
 	};
 
@@ -123,8 +123,8 @@
 			...iconLayerDefaultProps,
 			id: 'pickup-icon',
 			getIcon: getIconFn(pickupImg),
-			// show for 30 unit time before latest pickup time,
-			getFilterValue: (d) => d.time_window[1],
+			// show for 30 unit time before arrival
+			getFilterValue: (d) => d.arrival_time,
 			filterRange: [time, time + 30],
 			filterCategories: ['pickup'],
 			extensions: [new DataFilterExtension({ filterSize: 1, categorySize: 1 })]
@@ -136,8 +136,8 @@
 			...iconLayerDefaultProps,
 			id: 'dropoff-icon',
 			getIcon: getIconFn(dropoffImg),
-			// show 30 unit time before latest dropoff time,
-			getFilterValue: (d) => d.time_window[1],
+			// show 30 unit time before arrival
+			getFilterValue: (d) => d.arrival_time,
 			filterRange: [time, time + 30],
 			filterCategories: ['dropoff'],
 			extensions: [new DataFilterExtension({ filterSize: 1, categorySize: 1 })]
