@@ -47,9 +47,6 @@
 		: 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json';
 	$: iconDefaultColor = darkMode ? [255, 255, 255] : [0, 0, 0];
 
-	$: time = startTime;
-	$: if (time >= endTime) resetTime();
-
 	$: currentVehicle = trips.find((trip) => trip.vehicle === currentVehicleId);
 	$: currentVehicleDepot = currentVehicleId
 		? truncateLatLng(currentVehicle.original_path[0])
@@ -59,12 +56,21 @@
 	$: endTime = currentVehicle
 		? currentVehicle.original_time[currentVehicle.original_time.length - 1]
 		: serviceEndTime;
+	$: time = startTime;
 
 	$: filteredTrips = currentVehicleId ? [currentVehicle] : trips;
 	$: filteredStops = currentVehicleId
 		? stops.filter((stop) => currentVehicle?.route.includes(stop.idx))
 		: stops;
 
+	$: iconLayerDefaultProps = {
+		data: filteredStops,
+		getPosition: (d) => d.coordinates,
+		getSize: () => 20,
+		getColor: () => iconDefaultColor,
+		pickable: true
+	};
+	$: if (time >= endTime) resetTime();
 	$: renderLayers(time);
 
 	onMount(async () => {
@@ -199,14 +205,6 @@
 	});
 
 	const getDepotNode = (stop_idx) => (stop_idx - summary.num_requests * 2) % summary.num_depots;
-
-	$: iconLayerDefaultProps = {
-		data: filteredStops,
-		getPosition: (d) => d.coordinates,
-		getSize: () => 20,
-		getColor: () => iconDefaultColor,
-		pickable: true
-	};
 
 	function minutesToTime(mins) {
 		mins = mins.toFixed(0);
