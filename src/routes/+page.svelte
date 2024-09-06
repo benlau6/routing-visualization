@@ -222,8 +222,8 @@
 		bind:value={time}
 		on:mousedown={() => stopVehicles(moveId)}
 	/>
-		<div class="date">2024-08-01</div>
 	<div class="map-bottom-bar">
+		<div class="date">{date}</div>
 		<div class="time">
 			{minutesToTime(time)}
 		</div>
