@@ -60,7 +60,12 @@
 
 		// Create the deck.gl overlay
 		overlay = new MapboxOverlay({
-			layers: [createTripLayer(0), createDepotIconLayer()],
+			layers: [
+				createTripsLayer(time),
+				createPickupIconLayer(time),
+				createDropoffIconLayer(time),
+				createDepotIconLayer()
+			],
 			getTooltip: ({ object }) =>
 				object &&
 				`${object.type} 
@@ -78,7 +83,7 @@
 
 		overlay.setProps({
 			layers: [
-				createTripLayer(time),
+				createTripsLayer(time),
 				createPickupIconLayer(time),
 				createDropoffIconLayer(time),
 				createDepotIconLayer()
@@ -86,7 +91,7 @@
 		});
 	}
 
-	function createTripLayer(time) {
+	function createTripsLayer(time) {
 		return new TripsLayer({
 			id: 'trips',
 			data: trips,
