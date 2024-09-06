@@ -31,8 +31,8 @@
 	const summary = Object.fromEntries(
 		Object.entries(rawSummary).filter(([key, _]) => !key.includes('date'))
 	);
-	const startTime = 60 * 6; // 6:00
-	const endTime = 60 * 22; // 22:00
+	const serviceStartTime = 60 * 6; // 6:00
+	const serviceEndTime = 60 * 22; // 22:00
 
 	let map = null;
 	let overlay = null;
@@ -54,10 +54,17 @@
 	$: currentVehicleDepot = currentVehicleId
 		? truncateLatLng(currentVehicle.original_path[0])
 		: null;
+
+	$: startTime = currentVehicle ? currentVehicle.original_time[0] : serviceStartTime;
+	$: endTime = currentVehicle
+		? currentVehicle.original_time[currentVehicle.original_time.length - 1]
+		: serviceEndTime;
+
 	$: filteredTrips = currentVehicleId ? [currentVehicle] : trips;
 	$: filteredStops = currentVehicleId
 		? stops.filter((stop) => currentVehicle?.route.includes(stop.idx))
 		: stops;
+
 	$: renderLayers(time);
 
 	onMount(async () => {
