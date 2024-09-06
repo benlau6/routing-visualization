@@ -44,9 +44,9 @@
 
 	let moving = false;
 	let moveId = runVehicles();
+	let currentVehicleId = null;
 
 
-	let currentVehicleId = 0;
 	$: currentVehicle = trips.filter((trip) => trip.vehicle === currentVehicleId)[0];
 	$: currentVehicleDepot = truncateLatLng(currentVehicle.original_path[0]);
 	let map = null;
@@ -248,59 +248,58 @@
 			{/if}
 		</div>
 	</div>
-	<figure class="summary">
-		<figcaption>Summary Statistics</figcaption>
-		<ul>
-			{#each Object.entries(summary) as [key, value]}
-				{#if key.includes('duration') || key.includes('time')}
-					<li>{key.replaceAll('_', ' ')}: {value} mins</li>
-				{:else}
-					<li>{key.replaceAll('_', ' ')}: {value}</li>
-				{/if}
-			{/each}
-		</ul>
-	</figure>
-	<select class="vehicle-select" bind:value={currentVehicleId}>
-		{#each trips as trip}
-			<option value={trip.vehicle}>Route of vehicle {trip.vehicle}</option>
-		{/each}
-	</select>
-	<figure>
-		<figcaption>Details of Vehicle {currentVehicleId}</figcaption>
-		<div class="detail-wrapper">
-			<figure class="summary">
-				<figcaption>Summary</figcaption>
-				<ul>
-					{#each Object.entries(currentVehicle) as [key, value]}
-						{#if !['path', 'original_path', 'time', 'original_time', 'vehicle'].includes(key)}
-							{#if key.includes('duration') || key.includes('time')}
-								<li>{key.replaceAll('_', ' ')}: {value} mins</li>
-							{:else}
-								<li>{key.replaceAll('_', ' ')}: {value}</li>
+
+	{#if !currentVehicleId}
+		<figure class="summary">
+			<figcaption>Summary Statistics</figcaption>
+			<ul>
+				{#each Object.entries(summary) as [key, value]}
+					{#if key.includes('duration') || key.includes('time')}
+						<li>{key.replaceAll('_', ' ')}: {value} mins</li>
+					{:else}
+						<li>{key.replaceAll('_', ' ')}: {value}</li>
+					{/if}
+				{/each}
+			</ul>
+		</figure>
+	{:else}
+		<figure>
+			<figcaption>Details of the vehicle {currentVehicleId}</figcaption>
+			<div class="detail-wrapper">
+				<figure class="summary">
+					<figcaption>Summary</figcaption>
+					<ul>
+						{#each Object.entries(currentVehicle) as [key, value]}
+							{#if !['route', 'path', 'original_path', 'time', 'original_time', 'vehicle'].includes(key)}
+								{#if key.includes('duration') || key.includes('time')}
+									<li>{key.replaceAll('_', ' ')}: {value} mins</li>
+								{:else}
+									<li>{key.replaceAll('_', ' ')}: {value}</li>
+								{/if}
 							{/if}
-						{/if}
-					{/each}
-					<li>
-						Depot: <a href={getGoogleMapUrl(currentVehicleDepot[1], currentVehicleDepot[0])}
-							>{currentVehicleDepot[1]}, {currentVehicleDepot[0]}</a
-						>
-					</li>
-				</ul>
-			</figure>
-			<figure class="route">
-				<figcaption>Route</figcaption>
-				<ol>
-					{#each currentVehicle.original_path.map( (e, i) => [e, currentVehicle.original_time[i]] ) as [item, time]}
-						{@const [lng, lat] = truncateLatLng(item)}
+						{/each}
 						<li>
-							at {minutesToTime(time)}:
-							<a href={getGoogleMapUrl(lat, lng)}>{lat}, {lng}</a>
+							Depot: <a href={getGoogleMapUrl(currentVehicleDepot[1], currentVehicleDepot[0])}
+								>{currentVehicleDepot[1]}, {currentVehicleDepot[0]}</a
+							>
 						</li>
-					{/each}
-				</ol>
-			</figure>
-		</div>
-	</figure>
+					</ul>
+				</figure>
+				<figure class="route">
+					<figcaption>Route</figcaption>
+					<ol>
+						{#each currentVehicle.original_path.map( (e, i) => [e, currentVehicle.original_time[i]] ) as [item, time]}
+							{@const [lng, lat] = truncateLatLng(item)}
+							<li>
+								at {minutesToTime(time)}:
+								<a href={getGoogleMapUrl(lat, lng)}>{lat}, {lng}</a>
+							</li>
+						{/each}
+					</ol>
+				</figure>
+			</div>
+		</figure>
+	{/if}
 </main>
 
 <style>
