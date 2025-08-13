@@ -48,6 +48,16 @@
 	$: iconDefaultColor = darkMode ? [255, 255, 255] : [0, 0, 0];
 
 	$: currentVehicleDepot = currentVehicle ? truncateLatLng(currentVehicle.original_path[0]) : null;
+	$: currentVehicleItems = currentVehicle
+		? currentVehicle.original_path.map((val, idx) => [
+				val,
+				currentVehicle.original_time[idx],
+				currentVehicle.route[idx]
+			])
+		: null;
+	$: requests = currentVehicle
+		? currentVehicle.route.filter((val) => val < summary.num_requests)
+		: [...Array(summary.num_accepted_requests).keys()];
 
 	$: startTime = currentVehicle ? currentVehicle.original_time[0] : serviceStartTime;
 	$: endTime = currentVehicle
@@ -300,11 +310,22 @@
 				<figure class="route">
 					<figcaption>Route</figcaption>
 					<ol>
-						{#each currentVehicle.original_path.map( (e, i) => [e, currentVehicle.original_time[i]] ) as [item, time]}
+						{#each currentVehicleItems as [item, time, idx]}
 							{@const [lng, lat] = truncateLatLng(item)}
+							{@const stop_type_num = Math.floor(idx / summary.num_requests)}
+							{@const request_idx = idx % summary.num_requests}
+
 							<li>
 								at {minutesToTime(time)}:
 								<a href={getGoogleMapUrl(lat, lng)}>{lat}, {lng}</a>
+
+								{#if stop_type_num === 0}
+									<span>Pickup request {request_idx}</span>
+								{:else if stop_type_num === 1}
+									<span>Dropoff request {request_idx}</span>
+								{:else}
+									<span>Depot</span>
+								{/if}
 							</li>
 						{/each}
 					</ol>
@@ -312,41 +333,45 @@
 			</div>
 		</figure>
 	{/if}
-	<button class="request-btn" on:click={() => (showRequests = !showRequests)}>
-		{#if showRequests}
-			<span>Hide Handled Requests</span>
-		{:else}
-			<span>Show Handled Requests</span>
-		{/if}
-	</button>
-	{#if showRequests}
-		<figure class="summary">
-			<figcaption>Details of Handled Requests</figcaption>
-			<ul>
-				{#each [...Array(summary.num_accepted_requests).keys()] as i}
-					{@const pickup = stops[i]}
-					{@const dropoff = stops[i + Number(summary.num_requests)]}
-					<li>
-						Request {i + 1}:
-						<ul>
-							<li>
-								Pickup at {minutesToTime(pickup.arrival_time)}:
-								<a href={getGoogleMapUrl(pickup.coordinates[1], pickup.coordinates[0])}
-									>{pickup.coordinates[1]}, {pickup.coordinates[0]}</a
-								>
-							</li>
-							<li>
-								Dropoff at {minutesToTime(dropoff.arrival_time)}:
-								<a href={getGoogleMapUrl(dropoff.coordinates[1], dropoff.coordinates[0])}
-									>{dropoff.coordinates[1]}, {dropoff.coordinates[0]}</a
-								>
-							</li>
-						</ul>
-					</li>
-				{/each}
-			</ul>
-		</figure>
-	{/if}
+	<!-- <button class="request-btn" on:click={() => (showRequests = !showRequests)}> -->
+	<!-- 	{#if showRequests} -->
+	<!-- 		<span>Hide Handled Requests</span> -->
+	<!-- 	{:else} -->
+	<!-- 		<span>Show Handled Requests</span> -->
+	<!-- 	{/if} -->
+	<!-- </button> -->
+	<!-- {#if showRequests} -->
+	<!-- 	<figure class="summary"> -->
+	<!-- 		<figcaption>Details of Handled Requests</figcaption> -->
+	<!-- 		<ul> -->
+	<!-- 			{#each requests as i} -->
+	<!-- 				{@const pickup = stops[i]} -->
+	<!-- 				{@const dropoff = stops[i + Number(summary.num_requests)]} -->
+	<!-- 				{@const [pickupLat, pickupLng] = truncateLatLng([ -->
+	<!-- 					pickup.coordinates[1], -->
+	<!-- 					pickup.coordinates[0] -->
+	<!-- 				])} -->
+	<!-- 				{@const [dropoffLat, dropoffLng] = truncateLatLng([ -->
+	<!-- 					dropoff.coordinates[1], -->
+	<!-- 					dropoff.coordinates[0] -->
+	<!-- 				])} -->
+	<!-- 				<li> -->
+	<!-- 					Request {i}: -->
+	<!-- 					<ul> -->
+	<!-- 						<li> -->
+	<!-- 							at {minutesToTime(pickup.arrival_time)}: -->
+	<!-- 							<a href={getGoogleMapUrl(pickupLat, pickupLng)}>{pickupLat}, {pickupLng}</a> Pickup -->
+	<!-- 						</li> -->
+	<!-- 						<li> -->
+	<!-- 							at {minutesToTime(dropoff.arrival_time)}: -->
+	<!-- 							<a href={getGoogleMapUrl(dropoffLat, dropoffLng)}>{dropoffLat}, {dropoffLng}</a> Dropoff -->
+	<!-- 						</li> -->
+	<!-- 					</ul> -->
+	<!-- 				</li> -->
+	<!-- 			{/each} -->
+	<!-- 		</ul> -->
+	<!-- 	</figure> -->
+	<!-- {/if} -->
 </main>
 
 <style>
@@ -400,6 +425,9 @@
 	}
 	figure.summary > ul {
 		columns: 2;
+	}
+	div.detail-wrapper > figure.summary > ul {
+		columns: 1;
 	}
 
 	.detail-wrapper {
